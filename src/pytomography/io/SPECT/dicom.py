@@ -320,7 +320,7 @@ def _get_affine_spect_projections(filename:str) -> np.array:
     dz = ds.PixelSpacing[1]
     Sx -= ds.Rows / 2 * dx
     Sy -= ds.Rows / 2 * dy
-    Sy -= ds.RotationInformationSequence[0].TableHeight
+    # Sy -= ds.RotationInformationSequence[0].TableHeight
     M = np.zeros((4,4))
     M[0] = np.array([dx, 0, 0, Sx])
     M[1] = np.array([0, dy, 0, Sy])
@@ -345,7 +345,12 @@ def _get_affine_CT(filenames: Sequence[str]):
     M[0:3, 0] = np.array(ds.ImageOrientationPatient[0:3])*ds.PixelSpacing[0]
     M[0:3, 1] = np.array(ds.ImageOrientationPatient[3:])*ds.PixelSpacing[1]
     M[0:3, 2] = - np.array([0,0,1]) * ds.SliceThickness 
-    M[0:2, 3] = np.array(ds.ImagePositionPatient)[0:2] 
+    M[0:2, 3] = np.array(ds.ImagePositionPatient)[0:2]
+    try:
+        M[0, 3] -= ds.ReconstructionTargetCenterPatient[0]
+        M[1, 3] -= ds.ReconstructionTargetCenterPatient[1]
+    except AttributeError:
+        print("CT file don't have ReconstructionTargetCenterPatient attribute. Maybe a GEHC CT file."
     M[2, 3] = max_z
     M[3, 3] = 1
     return M
@@ -439,7 +444,7 @@ def save_dcm(
     Sx -= ds_NM.Rows / 2 * dx
     Sy -= ds_NM.Rows / 2 * dy
     # Y-Origin point at tableheight=0
-    Sy -= ds_NM.RotationInformationSequence[0].TableHeight
+    # Sy -= ds_NM.RotationInformationSequence[0].TableHeight
     # Sz now refers to location of lowest slice
     Sz -= (pixel_data.shape[0]-1) * dz
     SOP_instance_UID = generate_uid()
