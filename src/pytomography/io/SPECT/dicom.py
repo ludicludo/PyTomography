@@ -57,7 +57,10 @@ def parse_projection_dataset(ds: Dataset) -> Sequence[torch.Tensor, np.array, np
             angles = np.concatenate([angles, start_angle + delta_angle*np.arange(n_angles)])
         else:
             angles = np.concatenate([angles, start_angle - delta_angle*np.arange(n_angles)])
-        radial_positions_detector = ds.DetectorInformationSequence[detector-1].RadialPosition
+        try:    
+            radial_positions_detector = ds.DetectorInformationSequence[detector-1].RadialPosition
+        except AttributeError:
+            radial_positions_detector = ds.RotationInformationSequence[detector-1].RadialPosition
         if not isinstance(radial_positions_detector, collections.abc.Sequence):
             radial_positions_detector = n_angles * [radial_positions_detector]
         radii = np.concatenate([radii, radial_positions_detector])
