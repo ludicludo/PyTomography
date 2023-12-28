@@ -350,7 +350,7 @@ def _get_affine_CT(filenames: Sequence[str]):
         M[0, 3] -= ds.ReconstructionTargetCenterPatient[0]
         M[1, 3] -= ds.ReconstructionTargetCenterPatient[1]
     except AttributeError:
-        print("CT file don't have ReconstructionTargetCenterPatient attribute. Maybe a GEHC CT file."
+        print("CT file don't have ReconstructionTargetCenterPatient attribute. Maybe a GEHC CT file.")
     M[2, 3] = max_z
     M[3, 3] = 1
     return M
