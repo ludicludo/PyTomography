@@ -548,7 +548,7 @@ def save_dcm(
     ds.PixelSpacing = [dx, dy]
     ds.SliceThickness = dz
     ds.ImageOrientationPatient = [1, 0, 0, 0, 1, 0]
-    ds.RescaleSlope = 1 / scale_factor
+    ds.RescaleSlope = 1  # / scale_factor
     # Set other things
     ds.BitsAllocated = 16
     ds.BitsStored = 16
