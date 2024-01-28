@@ -524,7 +524,10 @@ def save_dcm(
             f"Folder {save_path} already exists; new folder name is required."
         )
     # Convert tensor image to numpy array
-    pixel_data = torch.permute(object.squeeze(), (2, 1, 0)) * scale_factor
+    pixel_data = torch.permute(object.squeeze(), (2, 1, 0))
+    pixel_data_max = pixel_data.max()
+    scale_factor = 2**15 / pixel_data_max
+    pixel_data *= scale_factor
     pixel_data = pixel_data.cpu().numpy().astype(np.uint16)
     # Get affine information
     ds_NM = pydicom.dcmread(file_NM)
@@ -548,10 +551,11 @@ def save_dcm(
     ds.PixelSpacing = [dx, dy]
     ds.SliceThickness = dz
     ds.ImageOrientationPatient = [1, 0, 0, 0, 1, 0]
-    ds.RescaleSlope = 1  # / scale_factor
+    ds.RescaleSlope = 1 / scale_factor
     # Set other things
     ds.BitsAllocated = 16
     ds.BitsStored = 16
+    ds.HighBit = 15
     ds.SamplesPerPixel = 1
     ds.PhotometricInterpretation = "MONOCHROME2"
     ds.PixelRepresentation = 0
